@@ -27,39 +27,38 @@ Fax_min = max(Fax1_min, Fax2_min); % [N] forza assiale minima
 
 % PUNTI 3-4 - SCELTA VITI E NUMERO DI VITI
 circonferenza_fori = pi*2*r_fori; % [m]
-%SCELTA VITE DI TENTATIVO M6
-D_testa = 0.010; % [m] è minore della dimensione massima 14 mm
-D_fori = 0.007; % [m] 1 mm in più rispetto al diametro nominale
-dist_min = 2.5*D_fori; % distanza minima tra i fori = 2.5 volte D
-Z = floor(circonferenza_fori/dist_min);
+%SCELTA VITE DI TENTATIVO M8
+d = 8; % diametro vite [mm]
+d2 = 7.188; % [mm] %diametro medio
+d3 = 6.466; % [mm] %diametro nocciolo
+p = 1.25; % [mm] passo
+D_testa = 13; % [mm] è minore della dimensione massima 14 mm
+D_fori = d + 1; % [mm] 1 mm in più rispetto al diametro nominale
+dist_min = 2.5*D_fori; %distanza minima tra i fori = 2.5 volte D
+Z = floor(circonferenza_fori/(dist_min*1e-3)); %numero di viti
 dist_fori = circonferenza_fori/Z; %Distanza centri dei fori 
 
 % PUNTO 5 - FORZA ASSIALE SU OGNI BULLONE
 F_kerf = Fax_min/Z; % [N] Carico assiale sul singolo bullone
 
 % PUNTO 6 - TENSIONE AL MONTAGGIO 
-d2 = 5.350; %[mm] %diametro medio
-d3 = 4.773; %[mm] %diametro nocciolo
-p = 1; %[mm] passo
 beta = deg2rad(30); 
 k = (d2/2)*((mu_vite/cos(beta))+(p/(pi*d2)))*(1/(2*d3/8));
 Rp02 = 950; %[MPa]
-%sigma = %F_kerf/((pi*d3^2)/4) ????
-sigma_M_max = (0.8*Rp02)/(sqrt(1+3*k^2)); %% o sigma*sqrt(1+ 3*k^2)????
+sigma_M_max = (0.8*Rp02)/(sqrt(1+3*k^2)); % [MPa]
 
 % PUNTO 7 - COPPIA DI SERRAGGIO
-Dkm = (D_testa+D_fori)*1000/2;
-Ad3 = 32.48; 
+Dkm = (D_testa+D_fori)/2; % [mm]
+Ad3 = 32.48; % [mm^2]
 F_m_max = sigma_M_max*Ad3;
-MA = (d2/2)*((mu_vite/cos(beta))+(p/(pi*d2))+Dkm*mu_vite/d2)*F_m_max;
+MA = (d2/2)*((mu_vite/cos(beta))+(p/(pi*d2))+Dkm*mu_vite/d2)*F_m_max; % [N*m]
 
 % PUNTO 8 - CEDEVOLEZZE
 % Scelgo vite interamente filettata (b non è in tabella) ??
-d = 8; % diametro vite [mm]
 b = 20;
-lf = p*6; %lunghezza della parte di vite avvitata (6 passi)
+lf = p*6; % lunghezza della parte di vite avvitata (6 passi)
 n_flange = 3;
-spessore_flange = 3.6; %[mm]
+spessore_flange = 3.6; % [mm]
 ltot_min = spessore_flange*n_flange + lf; %lunghezza complessiva necessaria < ltot
 ltot = b; %Scelgo filettatura completa
 lGew = spessore_flange*n_flange; %lunghezza parte filettata non avvitata
@@ -70,12 +69,10 @@ delta_s = deltaSFun(d,E_s,lGew,Ad3); % [mm/N]
 
 % Cedevolezza pezzo
 D_A = 16; % [mm] lunghezza radiale flange
-d_h = D_fori*1e3; % [mm] diametro foro 
 dk = 14; % [mm] forse 14 per limite geometrico? ma il minimo per le M8 è 15.8, chiedere
 l_k = spessore_flange*n_flange; % [mm] spessore pezzo
-E_p = E_s; % [MPa]
-delta_p = deltaPFun(D_A,d_h,dk,l_k,E_p); % [mm/N]
-
+E_p = 208*1e3; % [MPa]
+delta_p = deltaPFun(D_A,D_fori,dk,l_k,E_p); % [mm/N]
 
 % PUNTO 9 - DIAGRAMMA DI FORZAMENTO T amb
 u=linspace(0,0.1); %mm
@@ -96,25 +93,26 @@ ylabel('F [N]')
 legend('Vite','Pezzo')
 title('Diagramma di forzamento a temperatura ambiente')
 
-% %PUNTO 10 - VARIAZIONE DIAGRAMMA DI FORZAMENTO ALL'AUMENTARE DI T
+%PUNTO 10 - VARIAZIONE DIAGRAMMA DI FORZAMENTO ALL'AUMENTARE DI T
 % 400 °C
 % Cedevolezza vite
 E_s_400 = 185*1e3; %modulo di young vite, MPa
-delta_s_400 = deltaSFun
+delta_s_400 = deltaSFun(d,E_s_400,lGew,Ad3); % [mm/N]
 
 % Cedevolezza pezzo
-delta_p400 = l_k/(E_s_400*A_p); %cedevolezza pezzo 
+E_p_400 = 185*1e3; % [MPa]
+delta_p_400 = deltaPFun(D_A,D_fori,dk,l_k,E_p_400);
 
 %DIAGRAMMA DI FORZAMENTO A 400 °C
 u=linspace(0,0.1); %mm
-Fs=@(u) (1/delta_s400)*u;
-u_s = F_m_max*delta_s400;
-u_p = u_s+F_m_max*tan(delta_p400);
+Fs=@(u) (1/delta_s_400)*u;
+u_s = F_m_max*delta_s_400;
+u_p = u_s+F_m_max*tan(delta_p_400);
 delta_u = u_p-u_s;
 figure(2)
 plot(u,Fs(u),'b','lineWidth',1.5)
 hold on
-plot([u_s, u_s+F_m_max*tan(delta_p)],[F_m_max 0],'r','lineWidth',1.5)
+plot([u_s, u_s+F_m_max*tan(delta_p_400)],[F_m_max 0],'r','lineWidth',1.5)
 hold on
 plot(u_s,F_m_max,'og','lineWidth',2.5)
 yline(F_m_max)
@@ -127,33 +125,30 @@ title('Diagramma di forzamento a T = 400 °C')
 
 % 530 °C
 % Cedevolezza vite
-E530 = 176*1e3; %modulo di young vite, MPa
-delta_sk530 = lsk/(A_N*E530); 
-delta_G530 = lg/(Ad3*E530);
-delta_M530 = lm/(A_N*E530);
-delta_gm530 = delta_M530+delta_G530;
-delta_gew530 = lGew/(Ad3*E530);
-delta_s530 = delta_sk530 + delta_gm530 + delta_gew530;
+E_s_530 = 176*1e3; %modulo di young vite, MPa % chiedere se inconel o acciaio
+delta_s_530 = deltaSFun(d,E_s_530,lGew,Ad3); % [mm/N]
 
 % Cedevolezza pezzo
-delta_p530 = l_k/(E530*A_p); %cedevolezza pezzo 
+E_p_530 = 176*1e3; % [MPa]
+delta_p_530 = deltaPFun(D_A,D_fori,dk,l_k,E_p_530); % [mm/N]
 
-%DIAGRAMMA DI FORZAMENTO A 400 °C
+%DIAGRAMMA DI FORZAMENTO A 530 °C
 u=linspace(0,0.1); %mm
-Fs=@(u) (1/delta_s530)*u;
-u_s = F_m_max*delta_s530;
-u_p = u_s+F_m_max*tan(delta_p530);
+Fs=@(u) (1/delta_s_530)*u;
+u_s = F_m_max*delta_s_530;
+u_p = u_s+F_m_max*tan(delta_p_530);
 delta_u = u_p-u_s;
 figure(3)
 plot(u,Fs(u),'b','lineWidth',1.5)
 hold on
-plot([u_s, u_s+F_m_max*tan(delta_p)],[F_m_max 0],'r','lineWidth',1.5)
+plot([u_s, u_s+F_m_max*tan(delta_p_530)],[F_m_max 0],'r','lineWidth',1.5)
 hold on
 plot(u_s,F_m_max,'og','lineWidth',2.5)
 yline(F_m_max)
 grid on
 xlabel('u [mm]')
 ylabel('F [N]')
+ylim([0, 3.5*1e4])
 legend('Vite','Pezzo')
 title('Diagramma di forzamento a T = 530 °C')
 

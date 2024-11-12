@@ -29,24 +29,23 @@ Fax_min = max(Fax1_min, Fax2_min); % [N] forza assiale minima
 circonferenza_fori = pi*2*r_fori; % [m]
 %SCELTA VITE DI TENTATIVO M8
 d = 8; % diametro vite [mm]
+d2 = 7.188; % [mm] %diametro medio
+d3 = 6.466; % [mm] %diametro nocciolo
+p = 1.25; % [mm] passo
 D_testa = 13; % [mm] è minore della dimensione massima 14 mm
 D_fori = d + 1; % [mm] 1 mm in più rispetto al diametro nominale
 dist_min = 2.5*D_fori; %distanza minima tra i fori = 2.5 volte D
-Z = floor(circonferenza_fori/(dist_min*1e3)); %numero di viti
+Z = floor(circonferenza_fori/(dist_min*1e-3)); %numero di viti
 dist_fori = circonferenza_fori/Z; %Distanza centri dei fori 
 
 % PUNTO 5 - FORZA ASSIALE SU OGNI BULLONE
 F_kerf = Fax_min/Z; % [N] Carico assiale sul singolo bullone
 
 % PUNTO 6 - TENSIONE AL MONTAGGIO 
-d2 = 7.188; % [mm] %diametro medio
-d3 = 6.466; % [mm] %diametro nocciolo
-p = 1.25; % [mm] passo
 beta = deg2rad(30); 
 k = (d2/2)*((mu_vite/cos(beta))+(p/(pi*d2)))*(1/(2*d3/8));
 Rp02 = 950; %[MPa]
-%sigma = %F_kerf/((pi*d3^2)/4) ????
-sigma_M_max = (0.8*Rp02)/(sqrt(1+3*k^2)); %% o sigma*sqrt(1+ 3*k^2)????
+sigma_M_max = (0.8*Rp02)/(sqrt(1+3*k^2)); % [MPa]
 
 % PUNTO 7 - COPPIA DI SERRAGGIO
 Dkm = (D_testa+D_fori)/2; % [mm]
@@ -97,7 +96,7 @@ title('Diagramma di forzamento a temperatura ambiente')
 %PUNTO 10 - VARIAZIONE DIAGRAMMA DI FORZAMENTO ALL'AUMENTARE DI T
 % 400 °C
 % Cedevolezza vite
-E_s_400 = 185*1e3; %modulo di young vite, MPa % chiedere se inconel o acciaio
+E_s_400 = 185*1e3; %modulo di young vite, MPa
 delta_s_400 = deltaSFun(d,E_s_400,lGew,Ad3); % [mm/N]
 
 % Cedevolezza pezzo
