@@ -69,7 +69,7 @@ delta_s = deltaSFun(d,E_s,lGew,Ad3); % [mm/N]
 
 % Cedevolezza pezzo
 D_A = 16; % [mm] lunghezza radiale flange
-dk = 14; % [mm] forse 14 per limite geometrico? ma il minimo per le M8 è 15.8, chiedere
+dk = 13; % [mm] uguale a s da tabella
 l_k = spessore_flange*n_flange; % [mm] spessore pezzo
 E_p = 208*1e3; % [MPa]
 delta_p = deltaPFun(D_A,D_fori,dk,l_k,E_p); % [mm/N]
@@ -204,14 +204,14 @@ disp('-------------------------------------------------------------------')
 disp('8) T ambiente')
 disp(['8) delta_s = ', num2str(delta_s),' mm/N']);
 disp(['8) delta_p = ', num2str(delta_p),' mm/N']);
-% disp('-------------------------------------------------------------------')
-% disp('10) T = 400 °C')
-% disp(['10) delta_s = ', num2str(delta_s400),' mm/N']);
-% disp(['10) delta_p = ', num2str(delta_p400),' mm/N']);
-% disp('-------------------------------------------------------------------')
-% disp('10) T = 530 °C')
-% disp(['10) delta_s = ', num2str(delta_s530),' mm/N']);
-% disp(['10) delta_p = ', num2str(delta_p530),' mm/N']);
+disp('-------------------------------------------------------------------')
+disp('10) T = 400 °C')
+disp(['10) delta_s = ', num2str(delta_s_400),' mm/N']);
+disp(['10) delta_p = ', num2str(delta_p_400),' mm/N']);
+disp('-------------------------------------------------------------------')
+disp('10) T = 530 °C')
+disp(['10) delta_s = ', num2str(delta_s_530),' mm/N']);
+disp(['10) delta_p = ', num2str(delta_p_530),' mm/N']);
 disp('-------------------------------------------------------------------')
 disp(['11) FA1 = ', num2str(FA1), ' N']);
 disp(['11) FA2 = ', num2str(FA2), ' N']);
