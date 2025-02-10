@@ -1,6 +1,6 @@
 clear all
 close all
-clc
+% clc
 % DATI
 d = 100; %mm
 D = 150; %mm
@@ -34,15 +34,14 @@ g = g_min-D_g; %μm
 
 %% TABELLA
 % - Forza centrifuga blocco slide 2 pag. 40-42
-V = (pi*(dr^2)/4)*l_eff; % m^3
+V = (pi*(dr^2)/4)*lr; % m^3
 m_r = rho*V; %kg
 r_R = (di+de)/4; %m 
-% v_R = omega*(di/2)/2; %velocità gabbia (v_R)
-% omega_r = v_R/r_R;
-% Fc = m_r*(r_R)*omega_r^2; %N  OK
-Fc = m_r*r_R*omega^2;
+v_R = omega*(di/2)/2; %velocità gabbia (v_R)
+omega_r = v_R/r_R;
+Fc = m_r*(r_R)*omega_r^2; %N  OK
 
-n = 1/0.9; %cilindro (Slide 21)
+n = 1.11; %cilindro (Slide 21)
 Ko = (((B)^0.8)/3.84e-5)^n; % B
 Ki = Ko;
 delta_oc = (Fc/Ko)^(1/n); % unità di misura boh?
@@ -52,15 +51,14 @@ psi_max = ((zr-1)/(2*z))*2*pi; %rad
 psi_deg = psi_max*180/pi; %deg
 delta_r = (g/2+delta_oc)./cos(psi_max); %micron
 
-F0=(Ki+Ko)*delta_r.^n;
 
 % phi=0 e trovo F0
-% F0 = zeros(1,length(zr));
-% for j=1:length(zr)
-%     f = @(x) (x/Ki).^(1/n) + ((x+Fc)/Ko).^(1/n)-delta_r(j)+g/2;
-%     F0(j) = fzero(f,[0; 1000000]);
-%     x = linspace(0,10000);
-% end
+F0 = zeros(1,length(zr));
+for j=1:length(zr)
+    f = @(x) (x/Ki).^(1/n) + ((x+Fc)/Ko).^(1/n)-delta_r(j)+g/2;
+    F0(j) = fzero(f,[0; 1000000]);
+    x = linspace(0,10000);
+end
 
 figure(1)
 plot(delta_r,F0,'-*k','Linewidth',1)
