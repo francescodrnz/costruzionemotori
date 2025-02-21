@@ -29,8 +29,8 @@ D_g = abs(D_g_forz + D_g_temp); %μm
 % Classe C4
 g_min = 105; %μm
 g_max = 140; %μm
-g = g_min-D_g; %μm
-%g = g_max-D_g; %μm
+%g = g_min-D_g; %μm
+g = g_max-D_g; %μm
 
 %% TABELLA
 % - Forza centrifuga blocco slide 2 pag. 40-42
